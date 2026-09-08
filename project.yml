@@ -12,10 +12,10 @@ settings:
   base:
     SWIFT_VERSION: "5.10"
     SWIFT_STRICT_CONCURRENCY: complete
-    ENABLE_USER_SCRIPT_SANDBOXING: NO      # the validation phase reads Resources/
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
     GENERATE_INFOPLIST_FILE: YES
     CODE_SIGN_STYLE: Automatic
-    # DEVELOPMENT_TEAM: ABCDE12345         # set for on-device runs
+    # DEVELOPMENT_TEAM: ABCDE12345    # set for on-device runs
 
 targets:
 
@@ -24,8 +24,6 @@ targets:
     platform: iOS
     sources:
       - path: BlitzMath
-    # curriculum.json is a .json inside the source folder, so XcodeGen files it
-    # into Copy Bundle Resources automatically. No path is hard-coded in Swift.
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.blitzmath.app
@@ -40,14 +38,18 @@ targets:
     preBuildScripts:
       - name: Validate bundled payloads (SRS DV-08, Addendum PV-01 to PV-06)
         script: |
-          "${SRCROOT}/scripts/validate-curriculum.py" \
+          mkdir -p "${DERIVED_FILE_DIR}"
+          /usr/bin/env python3 "${SRCROOT}/scripts/validate-curriculum.py" \
             "${SRCROOT}/BlitzMath/Resources/curriculum.json" \
             "${SRCROOT}/BlitzMath/Domain/QuestionFactory.swift" \
             "${SRCROOT}/BlitzMath/Resources/placement.json"
+          touch "${DERIVED_FILE_DIR}/payload-validation.stamp"
         inputFiles:
           - $(SRCROOT)/BlitzMath/Resources/curriculum.json
           - $(SRCROOT)/BlitzMath/Resources/placement.json
           - $(SRCROOT)/BlitzMath/Domain/QuestionFactory.swift
+        outputFiles:
+          - $(DERIVED_FILE_DIR)/payload-validation.stamp
         basedOnDependencyAnalysis: true
 
   BlitzMathTests:

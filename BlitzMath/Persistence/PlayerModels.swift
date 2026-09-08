@@ -15,9 +15,8 @@ import SwiftData
 @Model
 final class PlayerProfile {
 
-    #Unique<PlayerProfile>([\.id])
 
-    var id: UUID = UUID()
+    @Attribute(.unique) var id: UUID = UUID()
     var displayName: String = "Player"
     var createdAt: Date = Date()
     var lastActiveAt: Date = Date()
@@ -180,9 +179,8 @@ final class ModuleProgressRecord {
 @Model
 final class SessionRecord {
 
-    #Unique<SessionRecord>([\.id])
 
-    var id: UUID = UUID()
+    @Attribute(.unique) var id: UUID = UUID()
     var moduleID: String = ""
     var levelID: String = ""
 
@@ -240,9 +238,8 @@ final class SessionRecord {
 @Model
 final class PlacementResultRecord {
 
-    #Unique<PlacementResultRecord>([\.id])
 
-    var id: UUID = UUID()
+    @Attribute(.unique) var id: UUID = UUID()
     var takenAt: Date = Date()
     var wasCompleted: Bool = false
 

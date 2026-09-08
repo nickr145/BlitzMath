@@ -65,7 +65,9 @@ final class BlitzClock {
         self.tickInterval = tickInterval
     }
 
-    deinit { tickTask?.cancel() }
+    // No deinit: the tick loop captures [weak self] and returns once the
+    // clock deallocates, so the task cancels itself. deinit is nonisolated
+    // and cannot touch @MainActor state.
 
     // MARK: Control
 
