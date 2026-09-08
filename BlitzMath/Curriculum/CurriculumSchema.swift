@@ -23,6 +23,13 @@ struct CurriculumPayload: Codable, Sendable, Equatable {
     var orderedLevels: [CurriculumLevel] {
         curriculum.sorted { $0.resolvedOrder < $1.resolvedOrder }
     }
+
+    enum CodingKeys: String, CodingKey {
+        case appName = "app_name"
+        case version
+        case schemaVersion = "schema_version"
+        case curriculum
+    }
 }
 
 // MARK: - Level
