@@ -1,0 +1,243 @@
+{
+  "app_name": "BlitzMath",
+  "version": "1.0.0",
+  "schema_version": "1.1",
+  "curriculum": [
+    {
+      "level_id": "A",
+      "level_name": "Basic Arithmetic Foundations",
+      "level_order": 1,
+      "unlock_requirement": null,
+      "modules": [
+        {
+          "id": "A_01",
+          "name": "Review of 2A Operations",
+          "target_sct_seconds": 120,
+          "question_count": 20,
+          "generator": { "kind": "addition_within_10", "params": { "min": 1, "max": 10 } }
+        },
+        {
+          "id": "A_02",
+          "name": "Addition Summary up to 24",
+          "target_sct_seconds": 180,
+          "question_count": 24,
+          "generator": { "kind": "addition_within_24", "params": { "min": 2, "max": 24 } }
+        },
+        {
+          "id": "A_03",
+          "name": "Subtraction by 1 and 2",
+          "target_sct_seconds": 120,
+          "question_count": 20,
+          "generator": { "kind": "subtraction_small_step", "params": { "max": 20, "max_step": 2 } }
+        },
+        {
+          "id": "A_04",
+          "name": "Mixed Operations to 20",
+          "target_sct_seconds": 180,
+          "question_count": 24,
+          "generator": { "kind": "mixed_within_20", "params": { "max": 20 } }
+        }
+      ]
+    },
+    {
+      "level_id": "B",
+      "level_name": "Multi-Digit Vertical Operations",
+      "level_order": 2,
+      "unlock_requirement": {
+        "source_level_id": "A",
+        "required_medal_count": 3,
+        "required_gold_count": 0
+      },
+      "modules": [
+        {
+          "id": "B_01",
+          "name": "Vertical Addition to 100",
+          "target_sct_seconds": 180,
+          "question_count": 20,
+          "generator": { "kind": "vertical_addition", "params": { "min": 10, "max": 89 } }
+        },
+        {
+          "id": "B_02",
+          "name": "Vertical Addition with Carrying",
+          "target_sct_seconds": 240,
+          "question_count": 20,
+          "generator": { "kind": "vertical_addition_carry", "params": { "min": 15, "max": 99 } }
+        },
+        {
+          "id": "B_03",
+          "name": "Vertical Subtraction with Borrowing",
+          "target_sct_seconds": 240,
+          "question_count": 20,
+          "generator": { "kind": "vertical_subtraction_borrow", "params": { "min": 21, "max": 99 } }
+        },
+        {
+          "id": "B_04",
+          "name": "Three-Term Column Addition",
+          "target_sct_seconds": 300,
+          "question_count": 16,
+          "generator": { "kind": "column_addition", "params": { "terms": 3, "min": 8, "max": 60 } }
+        }
+      ]
+    },
+    {
+      "level_id": "C",
+      "level_name": "Multiplication Foundations",
+      "level_order": 3,
+      "unlock_requirement": {
+        "source_level_id": "B",
+        "required_medal_count": 3,
+        "required_gold_count": 0
+      },
+      "modules": [
+        {
+          "id": "C_01",
+          "name": "Multiplication Tables 1 to 5",
+          "target_sct_seconds": 150,
+          "question_count": 25,
+          "generator": { "kind": "times_tables", "params": { "min_table": 1, "max_table": 5 } }
+        },
+        {
+          "id": "C_02",
+          "name": "Multiplication Tables 6 to 9",
+          "target_sct_seconds": 180,
+          "question_count": 25,
+          "generator": { "kind": "times_tables", "params": { "min_table": 6, "max_table": 9 } }
+        },
+        {
+          "id": "C_03",
+          "name": "Two-Digit by One-Digit Multiplication",
+          "target_sct_seconds": 240,
+          "question_count": 16,
+          "generator": { "kind": "long_multiplication", "params": { "left_digits": 2, "right_digits": 1 } }
+        },
+        {
+          "id": "C_04",
+          "name": "Long Multiplication Grids",
+          "target_sct_seconds": 300,
+          "question_count": 12,
+          "generator": { "kind": "long_multiplication", "params": { "left_digits": 2, "right_digits": 2 } }
+        }
+      ]
+    },
+    {
+      "level_id": "D",
+      "level_name": "Division and Rational Numbers",
+      "level_order": 4,
+      "unlock_requirement": {
+        "source_level_id": "C",
+        "required_medal_count": 3,
+        "required_gold_count": 0
+      },
+      "modules": [
+        {
+          "id": "D_01",
+          "name": "Division Facts without Remainders",
+          "target_sct_seconds": 180,
+          "question_count": 20,
+          "generator": { "kind": "division_exact", "params": { "max_divisor": 9, "max_quotient": 12 } }
+        },
+        {
+          "id": "D_02",
+          "name": "Division with Remainders",
+          "target_sct_seconds": 240,
+          "question_count": 20,
+          "generator": { "kind": "division_remainder", "params": { "max_divisor": 9, "max_dividend": 99 } }
+        },
+        {
+          "id": "D_03",
+          "name": "Fraction Identification",
+          "target_sct_seconds": 180,
+          "question_count": 18,
+          "generator": { "kind": "fraction_identification", "params": { "max_denominator": 12 } }
+        },
+        {
+          "id": "D_04",
+          "name": "Fraction Reduction",
+          "target_sct_seconds": 240,
+          "question_count": 18,
+          "generator": { "kind": "fraction_reduction", "params": { "max_denominator": 24 } }
+        }
+      ]
+    },
+    {
+      "level_id": "E",
+      "level_name": "Fraction Operations",
+      "level_order": 5,
+      "unlock_requirement": {
+        "source_level_id": "D",
+        "required_medal_count": 4,
+        "required_gold_count": 1
+      },
+      "modules": [
+        {
+          "id": "E_01",
+          "name": "Review of Division and Multiples",
+          "target_sct_seconds": 180,
+          "question_count": 20,
+          "generator": { "kind": "division_exact", "params": { "max_divisor": 12, "max_quotient": 12 } }
+        },
+        {
+          "id": "E_02",
+          "name": "Addition of Fractions (Like Denominators)",
+          "target_sct_seconds": 240,
+          "question_count": 20,
+          "generator": { "kind": "fraction_add_like", "params": { "max_denominator": 12 } }
+        },
+        {
+          "id": "E_03",
+          "name": "Subtraction of Mixed Fractions",
+          "target_sct_seconds": 300,
+          "question_count": 16,
+          "generator": { "kind": "mixed_fraction_subtract", "params": { "max_denominator": 12, "max_whole": 6 } }
+        },
+        {
+          "id": "E_04",
+          "name": "Addition of Fractions (Unlike Denominators)",
+          "target_sct_seconds": 300,
+          "question_count": 16,
+          "generator": { "kind": "fraction_add_unlike", "params": { "max_denominator": 12 } }
+        }
+      ]
+    },
+    {
+      "level_id": "F",
+      "level_name": "Advanced Order of Operations",
+      "level_order": 6,
+      "unlock_requirement": {
+        "source_level_id": "E",
+        "required_medal_count": 4,
+        "required_gold_count": 2
+      },
+      "modules": [
+        {
+          "id": "F_01",
+          "name": "Three-Fraction Mixed Operations",
+          "target_sct_seconds": 300,
+          "question_count": 14,
+          "generator": { "kind": "three_fraction_mixed", "params": { "max_denominator": 12 } }
+        },
+        {
+          "id": "F_02",
+          "name": "Fractions and Decimals Conversions",
+          "target_sct_seconds": 360,
+          "question_count": 16,
+          "generator": { "kind": "fraction_decimal_convert", "params": { "max_denominator": 20 } }
+        },
+        {
+          "id": "F_03",
+          "name": "Algebraic Word Problems",
+          "target_sct_seconds": 420,
+          "question_count": 12,
+          "generator": { "kind": "algebraic_word_problem", "params": { "max_coefficient": 12 } }
+        },
+        {
+          "id": "F_04",
+          "name": "Order of Operations with Brackets",
+          "target_sct_seconds": 360,
+          "question_count": 14,
+          "generator": { "kind": "order_of_operations", "params": { "max_term": 12 } }
+        }
+      ]
+    }
+  ]
+}

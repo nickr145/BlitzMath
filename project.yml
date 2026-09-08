@@ -1,0 +1,79 @@
+name: BlitzMath
+
+options:
+  bundleIdPrefix: com.blitzmath
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+  generateEmptyDirectories: false
+
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    SWIFT_STRICT_CONCURRENCY: complete
+    ENABLE_USER_SCRIPT_SANDBOXING: NO      # the validation phase reads Resources/
+    GENERATE_INFOPLIST_FILE: YES
+    CODE_SIGN_STYLE: Automatic
+    # DEVELOPMENT_TEAM: ABCDE12345         # set for on-device runs
+
+targets:
+
+  BlitzMath:
+    type: application
+    platform: iOS
+    sources:
+      - path: BlitzMath
+    # curriculum.json is a .json inside the source folder, so XcodeGen files it
+    # into Copy Bundle Resources automatically. No path is hard-coded in Swift.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.blitzmath.app
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: >-
+          UIInterfaceOrientationPortrait
+          UIInterfaceOrientationPortraitUpsideDown
+          UIInterfaceOrientationLandscapeLeft
+          UIInterfaceOrientationLandscapeRight
+        TARGETED_DEVICE_FAMILY: "1,2"
+    preBuildScripts:
+      - name: Validate bundled payloads (SRS DV-08, Addendum PV-01 to PV-06)
+        script: |
+          "${SRCROOT}/scripts/validate-curriculum.py" \
+            "${SRCROOT}/BlitzMath/Resources/curriculum.json" \
+            "${SRCROOT}/BlitzMath/Domain/QuestionFactory.swift" \
+            "${SRCROOT}/BlitzMath/Resources/placement.json"
+        inputFiles:
+          - $(SRCROOT)/BlitzMath/Resources/curriculum.json
+          - $(SRCROOT)/BlitzMath/Resources/placement.json
+          - $(SRCROOT)/BlitzMath/Domain/QuestionFactory.swift
+        basedOnDependencyAnalysis: true
+
+  BlitzMathTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: BlitzMathTests
+    dependencies:
+      - target: BlitzMath
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.blitzmath.app.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  BlitzMath:
+    build:
+      targets:
+        BlitzMath: all
+        BlitzMathTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: true
+      coverageTargets:
+        - BlitzMath
+      targets:
+        - BlitzMathTests

@@ -1,0 +1,56 @@
+{
+  "placement_version": "1.0.0",
+  "bands": [
+    { "band": "A", "entry_level_id": "A", "pace_seconds_per_question": 7.0, "mastery_accuracy": 0.80, "developing_accuracy": 0.60, "minimum_questions": 4 },
+    { "band": "B", "entry_level_id": "B", "pace_seconds_per_question": 14.0, "mastery_accuracy": 0.80, "developing_accuracy": 0.60, "minimum_questions": 4 },
+    { "band": "C", "entry_level_id": "C", "pace_seconds_per_question": 10.0, "mastery_accuracy": 0.80, "developing_accuracy": 0.60, "minimum_questions": 4 },
+    { "band": "D", "entry_level_id": "D", "pace_seconds_per_question": 18.0, "mastery_accuracy": 0.80, "developing_accuracy": 0.60, "minimum_questions": 6 },
+    { "band": "E", "entry_level_id": "E", "pace_seconds_per_question": 26.0, "mastery_accuracy": 0.75, "developing_accuracy": 0.55, "minimum_questions": 4 },
+    { "band": "F", "entry_level_id": "F", "pace_seconds_per_question": 38.0, "mastery_accuracy": 0.75, "developing_accuracy": 0.55, "minimum_questions": 4 }
+  ],
+  "sections": [
+    {
+      "section_id": "S1",
+      "title": "Adding and taking away",
+      "blurb": "Nine quick ones. Answer what you know and skip what you have not learned yet.",
+      "items": [
+        { "band": "A", "count": 3, "generator": { "kind": "addition_within_24", "params": { "min": 2, "max": 24 } } },
+        { "band": "A", "count": 2, "generator": { "kind": "subtraction_small_step", "params": { "max": 20, "max_step": 2 } } },
+        { "band": "B", "count": 2, "generator": { "kind": "vertical_addition_carry", "params": { "min": 15, "max": 99 } } },
+        { "band": "B", "count": 2, "generator": { "kind": "vertical_subtraction_borrow", "params": { "min": 21, "max": 99 } } }
+      ]
+    },
+    {
+      "section_id": "S2",
+      "title": "Times and sharing",
+      "blurb": "Multiplying and dividing. Same rules, nothing is graded.",
+      "items": [
+        { "band": "C", "count": 3, "generator": { "kind": "times_tables", "params": { "min_table": 2, "max_table": 9 } } },
+        { "band": "C", "count": 2, "generator": { "kind": "long_multiplication", "params": { "left_digits": 2, "right_digits": 1 } } },
+        { "band": "D", "count": 3, "generator": { "kind": "division_exact", "params": { "max_divisor": 9, "max_quotient": 12 } } }
+      ]
+    },
+    {
+      "section_id": "S3",
+      "title": "Whole numbers and the order of operations",
+      "blurb": "A few with more than one step in them.",
+      "items": [
+        { "band": "D", "count": 3, "generator": { "kind": "division_remainder", "params": { "max_divisor": 9, "max_dividend": 99 } } },
+        { "band": "F", "count": 3, "generator": { "kind": "order_of_operations", "params": { "max_term": 12 } } },
+        { "band": "F", "count": 2, "generator": { "kind": "algebraic_word_problem", "params": { "max_coefficient": 12 } } }
+      ]
+    },
+    {
+      "section_id": "S4",
+      "title": "Fractions",
+      "blurb": "Last one. Skip anything that looks new.",
+      "items": [
+        { "band": "D", "count": 2, "generator": { "kind": "fraction_reduction", "params": { "max_denominator": 24 } } },
+        { "band": "E", "count": 2, "generator": { "kind": "fraction_add_like", "params": { "max_denominator": 12 } } },
+        { "band": "E", "count": 2, "generator": { "kind": "fraction_add_unlike", "params": { "max_denominator": 12 } } },
+        { "band": "F", "count": 2, "generator": { "kind": "fraction_decimal_convert", "params": { "max_denominator": 20 } } },
+        { "band": "F", "count": 2, "generator": { "kind": "three_fraction_mixed", "params": { "max_denominator": 12 } } }
+      ]
+    }
+  ]
+}
