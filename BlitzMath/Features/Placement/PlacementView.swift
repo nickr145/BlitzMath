@@ -123,21 +123,19 @@ struct PlacementView: View {
             Spacer(minLength: 0)
 
             if let question = controller.currentQuestion {
-                Text(question.prompt)
-                    .font(question.presentation == .prose
-                          ? BlitzTheme.Typography.questionCompact
-                          : BlitzTheme.Typography.question)
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.6)
-                    .foregroundStyle(BlitzTheme.Palette.ink)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 32)
-                    .background(
-                        RoundedRectangle(cornerRadius: BlitzTheme.Layout.cardRadius)
-                            .fill(BlitzTheme.Palette.surface)
-                            .stroke(BlitzTheme.Palette.rule, lineWidth: 1.5)
-                    )
-                    .accessibilityLabel(question.prompt)
+                VStack(spacing: BlitzTheme.Layout.stackGap) {
+                    QuestionRenderer.render(question)
+                        .minimumScaleFactor(0.6)
+                        .padding(.horizontal, BlitzTheme.Layout.gutter)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 32)
+                .background(
+                    RoundedRectangle(cornerRadius: BlitzTheme.Layout.cardRadius)
+                        .fill(BlitzTheme.Palette.surface)
+                        .stroke(BlitzTheme.Palette.rule, lineWidth: 1.5)
+                )
+                .accessibilityLabel(question.prompt)
             }
 
             Spacer(minLength: 0)

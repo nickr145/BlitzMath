@@ -135,12 +135,7 @@ struct LevelSessionView: View {
     private var questionCard: some View {
         if let question = controller.currentQuestion {
             VStack(spacing: BlitzTheme.Layout.stackGap) {
-                Text(question.prompt)
-                    .font(question.presentation == .prose
-                          ? BlitzTheme.Typography.questionCompact
-                          : BlitzTheme.Typography.question)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(BlitzTheme.Palette.ink)
+                QuestionRenderer.render(question)
                     .minimumScaleFactor(0.6)
                     .padding(.horizontal, BlitzTheme.Layout.gutter)
             }
