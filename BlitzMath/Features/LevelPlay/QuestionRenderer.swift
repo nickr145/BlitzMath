@@ -202,7 +202,7 @@ enum QuestionRenderer {
 
         VStack(alignment: .trailing, spacing: BlitzTheme.Layout.tightGap) {
             // Multiplicand × Multiplier
-            HStack(alignment: .bottom, spacing: 8) {
+            HStack(alignment: .bottom, spacing: BlitzTheme.Layout.tightGap) {
                 Text(multiplicand)
                     .font(BlitzTheme.Typography.question)
                     .foregroundStyle(BlitzTheme.Palette.ink)
