@@ -109,7 +109,7 @@ enum QuestionRenderer {
     /// Renders a single fraction with numerator over denominator and horizontal bar.
     @ViewBuilder
     private static func fractionView(numerator: String, denominator: String) -> some View {
-        VStack(spacing: 2) {
+        VStack(spacing: BlitzTheme.Layout.tightGap / 4) {
             Text(numerator)
                 .font(BlitzTheme.Typography.question)
                 .foregroundStyle(BlitzTheme.Palette.ink)
@@ -125,7 +125,7 @@ enum QuestionRenderer {
                 .minimumScaleFactor(0.6)
                 .frame(maxWidth: .infinity)
         }
-        .frame(minWidth: 60)
+        .frame(minWidth: BlitzTheme.Layout.gutter * 3)
     }
 
     @ViewBuilder
@@ -189,7 +189,7 @@ enum QuestionRenderer {
                     Text(operation)
                         .font(BlitzTheme.Typography.question)
                         .foregroundStyle(BlitzTheme.Palette.inkSecondary)
-                        .frame(maxHeight: 60)
+                        .frame(maxHeight: BlitzTheme.Layout.gutter * 3)
                 }
             }
         }
