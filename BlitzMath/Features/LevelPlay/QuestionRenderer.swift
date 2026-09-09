@@ -62,7 +62,57 @@ enum QuestionRenderer {
         return (operands: operands, lastOperator: lastOperator, hasEquals: hasEquals)
     }
 
+    /// Extracts fractions from prompts like "3/4 + 5/8" or "Reduce 6/8".
+    /// Returns array of (numerator, denominator) tuples and the operation.
+    /// Example: "3/4 + 5/8 =" → (fractions: [(3,4), (5,8)], operation: "+", hasEquals: true)
+    private static func parseFractions(_ prompt: String) -> (fractions: [(num: String, denom: String)], operation: String, hasEquals: Bool) {
+        let trimmed = prompt.trimmingCharacters(in: .whitespaces)
+        let hasEquals = trimmed.hasSuffix("=")
+        let withoutEquals = hasEquals ? String(trimmed.dropLast()).trimmingCharacters(in: .whitespaces) : trimmed
+
+        var fractions: [(num: String, denom: String)] = []
+        var operation = ""
+
+        // Split by operators
+        let parts = withoutEquals.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+
+        for part in parts {
+            if part.contains("/") {
+                let components = part.components(separatedBy: "/")
+                if components.count == 2 {
+                    fractions.append((num: components[0], denom: components[1]))
+                }
+            } else if ["+", "−", "×", "÷"].contains(part) {
+                operation = part
+            }
+        }
+
+        return (fractions: fractions, operation: operation, hasEquals: hasEquals)
+    }
+
     // MARK: - Presentation styles
+
+    /// Renders a single fraction with numerator over denominator and horizontal bar.
+    @ViewBuilder
+    private static func fractionView(numerator: String, denominator: String) -> some View {
+        VStack(spacing: 2) {
+            Text(numerator)
+                .font(BlitzTheme.Typography.question)
+                .foregroundStyle(BlitzTheme.Palette.ink)
+                .minimumScaleFactor(0.6)
+                .frame(maxWidth: .infinity)
+
+            Divider()
+                .background(BlitzTheme.Palette.ink)
+
+            Text(denominator)
+                .font(BlitzTheme.Typography.question)
+                .foregroundStyle(BlitzTheme.Palette.ink)
+                .minimumScaleFactor(0.6)
+                .frame(maxWidth: .infinity)
+        }
+        .frame(minWidth: 60)
+    }
 
     @ViewBuilder
     private static func inlinePresentation(_ question: Question) -> some View {
@@ -115,8 +165,21 @@ enum QuestionRenderer {
 
     @ViewBuilder
     private static func fractionStackPresentation(_ question: Question) -> some View {
-        Text("fraction stack")
-            .font(BlitzTheme.Typography.question)
+        let (fractions, operation, _) = parseFractions(question.prompt)
+
+        HStack(alignment: .center, spacing: BlitzTheme.Layout.tightGap) {
+            ForEach(Array(fractions.enumerated()), id: \.offset) { index, fraction in
+                fractionView(numerator: fraction.num, denominator: fraction.denom)
+
+                if index < fractions.count - 1 && !operation.isEmpty {
+                    Text(operation)
+                        .font(BlitzTheme.Typography.question)
+                        .foregroundStyle(BlitzTheme.Palette.inkSecondary)
+                        .frame(maxHeight: 60)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder
