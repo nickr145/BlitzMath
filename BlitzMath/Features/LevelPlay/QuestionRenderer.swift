@@ -89,21 +89,23 @@ enum QuestionRenderer {
                 Text(operand)
                     .font(BlitzTheme.Typography.question)
                     .foregroundStyle(BlitzTheme.Palette.ink)
+                    .minimumScaleFactor(0.6)
                     .lineLimit(1)
             }
 
             if let lastOperand = operands.last {
                 Divider()
                     .background(BlitzTheme.Palette.ink)
-                    .padding(.bottom, 4)
+                    .padding(.bottom, BlitzTheme.Layout.tightGap / 2)
 
-                HStack(spacing: 4) {
+                HStack(spacing: BlitzTheme.Layout.tightGap / 2) {
                     Text(lastOperator)
                         .font(BlitzTheme.Typography.question)
                         .foregroundStyle(BlitzTheme.Palette.inkSecondary)
                     Text(lastOperand)
                         .font(BlitzTheme.Typography.question)
                         .foregroundStyle(BlitzTheme.Palette.ink)
+                        .minimumScaleFactor(0.6)
                         .lineLimit(1)
                 }
             }
