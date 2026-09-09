@@ -90,6 +90,20 @@ enum QuestionRenderer {
         return (fractions: fractions, operation: operation, hasEquals: hasEquals)
     }
 
+    /// Extracts operands from multiplication prompts like "23 × 4".
+    /// Returns (multiplicand, multiplier, hasEquals).
+    private static func parseMultiplication(_ prompt: String) -> (multiplicand: String, multiplier: String, hasEquals: Bool) {
+        let trimmed = prompt.trimmingCharacters(in: .whitespaces)
+        let hasEquals = trimmed.hasSuffix("=")
+        let withoutEquals = hasEquals ? String(trimmed.dropLast()).trimmingCharacters(in: .whitespaces) : trimmed
+
+        let parts = withoutEquals.components(separatedBy: "×").map { $0.trimmingCharacters(in: .whitespaces) }
+        let multiplicand = parts.first ?? ""
+        let multiplier = parts.count > 1 ? parts[1] : ""
+
+        return (multiplicand: multiplicand, multiplier: multiplier, hasEquals: hasEquals)
+    }
+
     // MARK: - Presentation styles
 
     /// Renders a single fraction with numerator over denominator and horizontal bar.
@@ -184,7 +198,35 @@ enum QuestionRenderer {
 
     @ViewBuilder
     private static func gridPresentation(_ question: Question) -> some View {
-        Text("grid")
-            .font(BlitzTheme.Typography.question)
+        let (multiplicand, multiplier, _) = parseMultiplication(question.prompt)
+
+        VStack(alignment: .trailing, spacing: BlitzTheme.Layout.tightGap) {
+            // Multiplicand × Multiplier
+            HStack(alignment: .bottom, spacing: 8) {
+                Text(multiplicand)
+                    .font(BlitzTheme.Typography.question)
+                    .foregroundStyle(BlitzTheme.Palette.ink)
+                    .minimumScaleFactor(0.6)
+                Text("×")
+                    .font(BlitzTheme.Typography.question)
+                    .foregroundStyle(BlitzTheme.Palette.inkSecondary)
+                Text(multiplier)
+                    .font(BlitzTheme.Typography.question)
+                    .foregroundStyle(BlitzTheme.Palette.ink)
+                    .minimumScaleFactor(0.6)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+
+            // Divider line
+            Divider()
+                .background(BlitzTheme.Palette.ink)
+
+            // Hint text about partial products
+            Text("Split and multiply each part →")
+                .font(BlitzTheme.Typography.caption)
+                .foregroundStyle(BlitzTheme.Palette.inkSecondary)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
