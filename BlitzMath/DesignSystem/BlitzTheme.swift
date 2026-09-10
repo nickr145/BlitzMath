@@ -105,6 +105,8 @@ enum BlitzTheme {
         static let levelCardStrokeWidth: CGFloat = 2
         /// Fraction of card size for lock cross padding (UI-05).
         static let levelCardLockCrossInsetRatio: CGFloat = 0.2
+        /// Diameter of the world map pagination dots (UI-05).
+        static let paginationDotSize: CGFloat = 6
     }
 
     // MARK: Motion

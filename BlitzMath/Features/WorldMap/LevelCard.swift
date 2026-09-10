@@ -12,6 +12,10 @@ struct WorldLevelCard: View {
     let row: WorldMapViewModel.LevelRow
     let worldID: String
     let onTap: (String) -> Void
+    /// Fires when a locked card is tapped, so the caller can surface the unlock
+    /// requirement (FR-NAV-003, FR-NAV-004). Defaults to a no-op for call sites
+    /// that don't need locked-tap feedback.
+    var onLockedTap: () -> Void = {}
 
     @State private var isPulsing = false
     @State private var isPressed = false
@@ -27,7 +31,13 @@ struct WorldLevelCard: View {
             stateContent
         }
         .frame(width: BlitzTheme.Layout.levelCardSize, height: BlitzTheme.Layout.levelCardSize)
-        .onTapGesture { if row.isUnlocked { onTap(row.level.levelID) } }
+        .onTapGesture {
+            if row.isUnlocked {
+                onTap(row.level.levelID)
+            } else {
+                onLockedTap()
+            }
+        }
         .scaleEffect(isPressed && row.isUnlocked ? BlitzTheme.Motion.tapScale : 1.0)
         .animation(.easeInOut(duration: BlitzTheme.Motion.pressAnimationDuration), value: isPressed)
         .onLongPressGesture(minimumDuration: 0.001) {
