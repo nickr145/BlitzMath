@@ -10,6 +10,7 @@
 import SwiftUI
 
 struct ProgressReviewView: View {
+    let curriculum: CurriculumProviding
     let store: ProgressPersisting
 
     @State private var medalSnapshot: MedalSnapshot?
@@ -18,7 +19,11 @@ struct ProgressReviewView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    private static let worldIDs = ["A", "B", "C", "D", "E", "F"]
+    /// Worlds come from the bundled curriculum, in `level_order`, so a content
+    /// change needs no Swift change (SRS FR-CUR-005, FR-NAV-001).
+    private var worldIDs: [String] {
+        curriculum.payload.orderedLevels.map(\.levelID)
+    }
 
     var body: some View {
         VStack(spacing: BlitzTheme.Layout.stackGap) {
@@ -29,7 +34,7 @@ struct ProgressReviewView: View {
                 Spacer()
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 24))
+                        .font(BlitzTheme.Typography.closeIcon)
                         .foregroundStyle(BlitzTheme.Palette.inkSecondary)
                 }
                 .frame(minWidth: BlitzTheme.Layout.minimumTarget, minHeight: BlitzTheme.Layout.minimumTarget)
@@ -45,7 +50,7 @@ struct ProgressReviewView: View {
             } else if let snapshot = medalSnapshot {
                 ScrollView {
                     VStack(spacing: BlitzTheme.Layout.stackGap) {
-                        ForEach(Self.worldIDs, id: \.self) { worldID in
+                        ForEach(worldIDs, id: \.self) { worldID in
                             WorldProgressRow(worldID: worldID,
                                              counts: snapshot.counts(for: worldID),
                                              summaries: moduleSummariesByWorld[worldID] ?? [])
@@ -65,7 +70,7 @@ struct ProgressReviewView: View {
         do {
             let snapshot = try store.medalSnapshot()
             var summaries: [String: [ModuleSummary]] = [:]
-            for worldID in Self.worldIDs {
+            for worldID in worldIDs {
                 summaries[worldID] = try store.moduleSummaries(levelID: worldID)
             }
             medalSnapshot = snapshot
@@ -148,5 +153,5 @@ private struct WorldProgressRow: View {
 // MARK: - Preview
 
 #Preview {
-    ProgressReviewView(store: MockProgressStore())
+    ProgressReviewView(curriculum: MockCurriculumProvider(), store: MockProgressStore())
 }

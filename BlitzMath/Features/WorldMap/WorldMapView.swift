@@ -77,7 +77,9 @@ struct WorldMapView: View {
 
     /// Non-nil while a World's module list is presented (FR-NAV).
     @State private var activeDetailRow: WorldMapViewModel.LevelRow?
-    @State private var currentWorldIndex = 0
+    /// Level ID of the planetoid currently leading the horizontal scroll, so the
+    /// pagination dots report real position rather than a fixed value.
+    @State private var currentWorldID: String?
     /// Requirement text for a locked level the player just tapped (FR-NAV-003).
     /// Presented as a toast-style alert; non-nil drives its visibility.
     @State private var lockedMessageText: String?
@@ -95,23 +97,26 @@ struct WorldMapView: View {
                 VStack(spacing: 0) {
                     header
 
-                    ScrollViewReader { scrollProxy in
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: BlitzTheme.Layout.worldSpacing) {
-                                ForEach(model.rows) { row in
-                                    PlanetoidContainer(row: row, scrollProxy: scrollProxy) {
-                                        guard row.isUnlocked else { return }
-                                        activeDetailRow = row
-                                    } onLockedTap: {
-                                        lockedMessageText = row.requirementText
-                                            ?? "Complete the previous level first."
-                                    }
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        // Top aligned so every planetoid sits on the same line
+                        // whether or not it carries a requirement caption.
+                        HStack(alignment: .top, spacing: BlitzTheme.Layout.worldSpacing) {
+                            ForEach(model.rows) { row in
+                                PlanetoidContainer(row: row) {
+                                    guard row.isUnlocked else { return }
+                                    activeDetailRow = row
+                                } onLockedTap: {
+                                    lockedMessageText = row.requirementText
+                                        ?? "Complete the previous level first."
                                 }
                             }
-                            .padding(BlitzTheme.Layout.gutter)
                         }
-                        .frame(height: BlitzTheme.Layout.worldDiameter + 100)
+                        .scrollTargetLayout()
+                        .padding(BlitzTheme.Layout.gutter)
                     }
+                    .scrollPosition(id: $currentWorldID)
+                    .frame(height: BlitzTheme.Layout.worldDiameter
+                           + BlitzTheme.Layout.worldCaptionHeight)
 
                     Spacer()
                     paginationDots
@@ -153,13 +158,23 @@ struct WorldMapView: View {
 
     private var paginationDots: some View {
         HStack(spacing: BlitzTheme.Layout.tightGap) {
-            ForEach(0..<model.rows.count, id: \.self) { index in
+            ForEach(model.rows) { row in
                 Circle()
-                    .fill(index == currentWorldIndex ? BlitzTheme.Palette.velocity : BlitzTheme.Palette.rule)
-                    .frame(width: BlitzTheme.Layout.paginationDotSize, height: BlitzTheme.Layout.paginationDotSize)
+                    .fill(row.id == resolvedCurrentWorldID
+                          ? BlitzTheme.Palette.velocity
+                          : BlitzTheme.Palette.rule)
+                    .frame(width: BlitzTheme.Layout.paginationDotSize,
+                           height: BlitzTheme.Layout.paginationDotSize)
             }
         }
         .padding(.bottom, BlitzTheme.Layout.gutter)
+        .accessibilityHidden(true)
+    }
+
+    /// `scrollPosition` reports nil until the first scroll, which means the
+    /// leading planetoid.
+    private var resolvedCurrentWorldID: String? {
+        currentWorldID ?? model.rows.first?.id
     }
 }
 
@@ -172,7 +187,6 @@ extension String: @retroactive Identifiable {
 
 struct PlanetoidContainer: View {
     let row: WorldMapViewModel.LevelRow
-    let scrollProxy: ScrollViewProxy
     /// Fires when the level's card is tapped while unlocked, to open its
     /// module list (LevelDetailView).
     let onSelectLevel: () -> Void
@@ -180,20 +194,35 @@ struct PlanetoidContainer: View {
     var onLockedTap: () -> Void = {}
 
     var body: some View {
-        ZStack(alignment: .center) {
-            // Planetoid shape
-            PlanetoidShape(worldID: row.level.levelID)
-                .fill(worldFill)
-                .stroke(worldOutline, lineWidth: 2.5)
+        VStack(spacing: BlitzTheme.Layout.tightGap) {
+            ZStack(alignment: .center) {
+                // Planetoid shape. The stroke pass is what makes World D's
+                // internal segment lines visible.
+                PlanetoidShape(worldID: row.level.levelID)
+                    .fill(worldFill)
+                    .stroke(worldOutline, lineWidth: BlitzTheme.Layout.worldStrokeWidth)
 
-            // Decorative elements per world (placeholder for now)
-            worldDecorations
+                // Unlocked tap opens the World's module list (LevelDetailView);
+                // locked tap surfaces the unlock requirement (FR-NAV-004).
+                WorldLevelCard(row: row, worldID: row.level.levelID) { _ in
+                    onSelectLevel()
+                } onLockedTap: {
+                    onLockedTap()
+                }
+            }
+            .frame(width: BlitzTheme.Layout.worldDiameter,
+                   height: BlitzTheme.Layout.worldDiameter)
 
-            // Level cards overlay in positions
-            levelCardsOverlay
+            // A locked Level displays its outstanding requirement, it is not
+            // only surfaced after a tap (SRS FR-NAV-003).
+            if !row.isUnlocked, let requirementText = row.requirementText {
+                Text(requirementText)
+                    .font(BlitzTheme.Typography.caption)
+                    .foregroundStyle(BlitzTheme.Palette.inkSecondary)
+                    .multilineTextAlignment(.center)
+                    .frame(width: BlitzTheme.Layout.worldDiameter)
+            }
         }
-        .frame(width: BlitzTheme.Layout.worldDiameter, height: BlitzTheme.Layout.worldDiameter)
-        .id(row.level.levelID)
     }
 
     private var worldFill: Color {
@@ -220,26 +249,6 @@ struct PlanetoidContainer: View {
         }
     }
 
-    @ViewBuilder
-    private var worldDecorations: some View {
-        // Placeholder: decorations per design brief (triangles for A, blocks for B, arrays for C, etc.)
-        // Will be implemented in Task 5 refinement if needed
-        EmptyView()
-    }
-
-    private var levelCardsOverlay: some View {
-        VStack(spacing: BlitzTheme.Layout.tightGap) {
-            HStack(spacing: BlitzTheme.Layout.tightGap) {
-                // Unlocked tap opens the World's module list (LevelDetailView);
-                // locked tap surfaces the unlock requirement (FR-NAV-003).
-                WorldLevelCard(row: row, worldID: row.level.levelID) { _ in
-                    onSelectLevel()
-                } onLockedTap: {
-                    onLockedTap()
-                }
-            }
-        }
-    }
 }
 
 // MARK: - Preview
