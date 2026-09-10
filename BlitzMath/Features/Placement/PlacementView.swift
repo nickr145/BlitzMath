@@ -56,7 +56,11 @@ struct OnboardingChoiceView: View {
 struct PlacementView: View {
 
     @State private var controller: PlacementController
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    /// In-app Reduce Motion preference (SRS FR-SET-002).
+    @AppStorage(BlitzTheme.Motion.reduceMotionOverrideKey) private var reduceMotionOverride = false
+
+    private var reduceMotion: Bool { systemReduceMotion || reduceMotionOverride }
 
     /// Called once the player has been placed, or has left the test.
     let onFinished: () -> Void

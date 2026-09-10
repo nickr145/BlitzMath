@@ -11,8 +11,12 @@ import SwiftUI
 struct LevelSessionView: View {
 
     @State private var controller: LevelSessionController
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     @Environment(\.dismiss) private var dismiss
+    /// In-app Reduce Motion preference (SRS FR-SET-002).
+    @AppStorage(BlitzTheme.Motion.reduceMotionOverrideKey) private var reduceMotionOverride = false
+
+    private var reduceMotion: Bool { systemReduceMotion || reduceMotionOverride }
 
     private let moduleID: String
 
@@ -350,8 +354,12 @@ struct SessionSummaryView: View {
     let onRetrySave: () -> Void
     let onDone: () -> Void
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    /// In-app Reduce Motion preference (SRS FR-SET-002).
+    @AppStorage(BlitzTheme.Motion.reduceMotionOverrideKey) private var reduceMotionOverride = false
     @State private var revealed = false
+
+    private var reduceMotion: Bool { systemReduceMotion || reduceMotionOverride }
 
     var body: some View {
         VStack(spacing: BlitzTheme.Layout.stackGap) {

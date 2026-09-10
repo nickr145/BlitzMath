@@ -20,6 +20,11 @@ struct WorldLevelCard: View {
     @State private var isPulsing = false
     @State private var isPressed = false
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// In-app Reduce Motion preference (SRS FR-SET-002), read alongside the
+    /// system setting so either one suppresses the pulse.
+    @AppStorage(BlitzTheme.Motion.reduceMotionOverrideKey) private var reduceMotionOverride = false
+
     var body: some View {
         ZStack {
             // Card background based on state
@@ -48,7 +53,9 @@ struct WorldLevelCard: View {
         .onAppear {
             if row.isUnlocked && !row.isCompleted { startPulsing() }
         }
+        .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityText)
+        .accessibilityAddTraits(.isButton)
     }
 
     private var cardFill: Color {
@@ -129,10 +136,16 @@ struct WorldLevelCard: View {
         return .none
     }
 
+    /// The pulse breathes in and out, so it autoreverses rather than snapping
+    /// back to 1.0 on each repeat. A looping pulse has no gentler substitute,
+    /// so Reduce Motion, from the system or from the in-app preference, holds
+    /// the card at rest instead (SRS FR-FBK-003, FR-SET-002).
     private func startPulsing() {
-        let animation = Animation.easeInOut(duration: BlitzTheme.Motion.pulseDuration).repeatForever(autoreverses: false)
-        withAnimation(animation) {
-            isPulsing = true
+        let reduced = reduceMotion || reduceMotionOverride
+        let pulse = Animation.easeInOut(duration: BlitzTheme.Motion.pulseDuration)
+            .repeatForever(autoreverses: true)
+        withAnimation(BlitzTheme.Motion.respectingReduceMotion(pulse, reduced: reduced)) {
+            isPulsing = !reduced
         }
     }
 }

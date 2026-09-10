@@ -1,7 +1,18 @@
+//
+//  SettingsView.swift
+//  BlitzMath
+//
+//  Accessibility preferences that sit alongside the device settings
+//  (SRS FR-SET-001, FR-SET-002).
+//
+
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("reduceMotionOverride") private var reduceMotionEnabled = false
+    /// Forces Reduce Motion on inside the app even when the device setting is
+    /// off. Every animated site reads this key alongside
+    /// `\.accessibilityReduceMotion` (SRS FR-SET-002).
+    @AppStorage(BlitzTheme.Motion.reduceMotionOverrideKey) private var reduceMotionEnabled = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -13,7 +24,7 @@ struct SettingsView: View {
                 Spacer()
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 24))
+                        .font(BlitzTheme.Typography.closeIcon)
                         .foregroundStyle(BlitzTheme.Palette.inkSecondary)
                 }
                 .frame(minWidth: BlitzTheme.Layout.minimumTarget, minHeight: BlitzTheme.Layout.minimumTarget)
@@ -30,7 +41,7 @@ struct SettingsView: View {
                         Text("Reduce Motion")
                             .font(BlitzTheme.Typography.body)
                             .foregroundStyle(BlitzTheme.Palette.ink)
-                        Text("Disable animations for accessibility")
+                        Text("Turn off the moving parts. Your device setting still applies.")
                             .font(BlitzTheme.Typography.caption)
                             .foregroundStyle(BlitzTheme.Palette.inkSecondary)
                     }
