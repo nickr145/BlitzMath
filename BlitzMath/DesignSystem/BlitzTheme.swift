@@ -138,8 +138,6 @@ enum BlitzTheme {
         static let lockedStroke: CGFloat = 0.5
         /// Opacity for X mark when locked (UI-05).
         static let lockedX: CGFloat = 0.4
-        /// Opacity for checkmark when completed (UI-05).
-        static let completedCheckmark: CGFloat = 0.8
     }
 
     // MARK: Medal mapping
