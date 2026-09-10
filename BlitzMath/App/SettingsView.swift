@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var reduceMotionEnabled = false
+    @AppStorage("reduceMotionOverride") private var reduceMotionEnabled = false
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: BlitzTheme.Layout.stackGap) {
@@ -15,6 +16,8 @@ struct SettingsView: View {
                         .font(.system(size: 24))
                         .foregroundStyle(BlitzTheme.Palette.inkSecondary)
                 }
+                .frame(minWidth: BlitzTheme.Layout.minimumTarget, minHeight: BlitzTheme.Layout.minimumTarget)
+                .accessibilityLabel("Close")
             }
             .padding(BlitzTheme.Layout.gutter)
 
@@ -40,8 +43,6 @@ struct SettingsView: View {
         }
         .background(GraphPaperGrid().ignoresSafeArea())
     }
-
-    @Environment(\.dismiss) private var dismiss
 }
 
 #Preview {
