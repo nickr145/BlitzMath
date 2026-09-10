@@ -76,6 +76,7 @@ struct WorldMapView: View {
     private let makeSessionController: () -> LevelSessionController
 
     @State private var activeModuleID: String?
+    @State private var currentWorldIndex = 0
 
     init(model: WorldMapViewModel, makeSessionController: @escaping () -> LevelSessionController) {
         _model = State(initialValue: model)
@@ -84,25 +85,59 @@ struct WorldMapView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: BlitzTheme.Layout.stackGap) {
-                    ForEach(model.rows) { row in
-                        LevelCard(row: row) { moduleID in
-                            guard row.isUnlocked else { return }
-                            activeModuleID = moduleID
+            ZStack {
+                background
+
+                VStack(spacing: 0) {
+                    header
+
+                    ScrollViewReader { scrollProxy in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: BlitzTheme.Layout.worldSpacing) {
+                                ForEach(model.rows) { row in
+                                    PlanetoidContainer(row: row, scrollProxy: scrollProxy) { moduleID in
+                                        guard row.isUnlocked else { return }
+                                        activeModuleID = moduleID
+                                    }
+                                }
+                            }
+                            .padding(BlitzTheme.Layout.gutter)
                         }
+                        .frame(height: BlitzTheme.Layout.worldDiameter + 100)
                     }
+
+                    Spacer()
+                    paginationDots
                 }
-                .padding(BlitzTheme.Layout.gutter)
             }
-            .background(GraphPaperGrid().ignoresSafeArea())
-            .navigationTitle("BlitzMath")
             .task { model.refresh() }
             .fullScreenCover(item: $activeModuleID) { moduleID in
                 LevelSessionView(moduleID: moduleID, controller: makeSessionController())
                     .onDisappear { model.refresh() }
             }
         }
+    }
+
+    private var background: some View {
+        GraphPaperGrid().ignoresSafeArea()
+    }
+
+    private var header: some View {
+        Text("Choose your world")
+            .font(BlitzTheme.Typography.title)
+            .foregroundStyle(BlitzTheme.Palette.ink)
+            .padding(.vertical, BlitzTheme.Layout.stackGap)
+    }
+
+    private var paginationDots: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<model.rows.count, id: \.self) { index in
+                Circle()
+                    .fill(index == currentWorldIndex ? BlitzTheme.Palette.velocity : BlitzTheme.Palette.rule)
+                    .frame(width: 6, height: 6)
+            }
+        }
+        .padding(.bottom, BlitzTheme.Layout.gutter)
     }
 }
 
@@ -111,106 +146,72 @@ extension String: @retroactive Identifiable {
     public var id: String { self }
 }
 
-// MARK: - Level card
+// MARK: - Planetoid container
 
-struct LevelCard: View {
+struct PlanetoidContainer: View {
     let row: WorldMapViewModel.LevelRow
+    let scrollProxy: ScrollViewProxy
     let onSelectModule: (String) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: BlitzTheme.Layout.tightGap) {
-            header
+        ZStack(alignment: .center) {
+            // Planetoid shape
+            PlanetoidShape(worldID: row.level.levelID)
+                .fill(worldFill)
+                .stroke(worldOutline, lineWidth: 2.5)
 
-            if let requirementText = row.requirementText {
-                Text(requirementText)
-                    .font(BlitzTheme.Typography.body)
-                    .foregroundStyle(BlitzTheme.Palette.inkSecondary)
-            } else {
-                ForEach(row.level.modules) { module in
-                    ModuleRow(module: module,
-                              summary: row.summary(for: module.id),
-                              isEnabled: row.isUnlocked) {
-                        onSelectModule(module.id)
-                    }
+            // Decorative elements per world (placeholder for now)
+            worldDecorations
+
+            // Level cards overlay in positions
+            levelCardsOverlay
+        }
+        .frame(width: BlitzTheme.Layout.worldDiameter, height: BlitzTheme.Layout.worldDiameter)
+        .id(row.level.levelID)
+    }
+
+    private var worldFill: Color {
+        switch row.level.levelID.uppercased() {
+        case "A": return BlitzTheme.WorldPalette.a.fill
+        case "B": return BlitzTheme.WorldPalette.b.fill
+        case "C": return BlitzTheme.WorldPalette.c.fill
+        case "D": return BlitzTheme.WorldPalette.d.fill
+        case "E": return BlitzTheme.WorldPalette.e.fill
+        case "F": return BlitzTheme.WorldPalette.f.fill
+        default: return BlitzTheme.WorldPalette.a.fill
+        }
+    }
+
+    private var worldOutline: Color {
+        switch row.level.levelID.uppercased() {
+        case "A": return BlitzTheme.WorldPalette.a.outline
+        case "B": return BlitzTheme.WorldPalette.b.outline
+        case "C": return BlitzTheme.WorldPalette.c.outline
+        case "D": return BlitzTheme.WorldPalette.d.outline
+        case "E": return BlitzTheme.WorldPalette.e.outline
+        case "F": return BlitzTheme.WorldPalette.f.outline
+        default: return BlitzTheme.WorldPalette.a.outline
+        }
+    }
+
+    @ViewBuilder
+    private var worldDecorations: some View {
+        // Placeholder: decorations per design brief (triangles for A, blocks for B, arrays for C, etc.)
+        // Will be implemented in Task 5 refinement if needed
+        EmptyView()
+    }
+
+    private var levelCardsOverlay: some View {
+        VStack(spacing: BlitzTheme.Layout.tightGap) {
+            HStack(spacing: BlitzTheme.Layout.tightGap) {
+                WorldLevelCard(row: row, worldID: row.level.levelID) { _ in
+                    // Module selection handled by card
+                }
+                .onTapGesture {
+                    // Will navigate to LevelDetailView in Task 6
                 }
             }
         }
-        .padding(BlitzTheme.Layout.gutter)
-        .background(
-            RoundedRectangle(cornerRadius: BlitzTheme.Layout.cardRadius)
-                .fill(BlitzTheme.Palette.surface.opacity(row.isUnlocked ? 1 : 0.7))
-                .stroke(BlitzTheme.Palette.rule, lineWidth: 1)
-        )
-    }
-
-    private var header: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text("World \(row.level.levelID)")
-                .font(BlitzTheme.Typography.caption)
-                .foregroundStyle(BlitzTheme.Palette.inkSecondary)
-            Text(row.level.levelName)
-                .font(BlitzTheme.Typography.title)
-                .foregroundStyle(row.isUnlocked ? BlitzTheme.Palette.ink : BlitzTheme.Palette.locked)
-            Spacer()
-            // Lock state carried by text and shape, not colour alone (FR-NAV-002).
-            Label(stateText, systemImage: stateSymbol)
-                .labelStyle(.iconOnly)
-                .foregroundStyle(row.isUnlocked ? BlitzTheme.Palette.velocity : BlitzTheme.Palette.locked)
-                .accessibilityLabel(stateText)
-        }
-    }
-
-    private var stateText: String {
-        if row.isCompleted { return "Finished" }
-        return row.isUnlocked ? "Open" : "Locked"
-    }
-
-    private var stateSymbol: String {
-        if row.isCompleted { return "checkmark.seal" }
-        return row.isUnlocked ? "play.circle" : "lock"
-    }
-}
-
-// MARK: - Module row
-
-struct ModuleRow: View {
-    let module: CurriculumModule
-    let summary: ModuleSummary?
-    let isEnabled: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: BlitzTheme.Layout.stackGap) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(module.name)
-                        .font(BlitzTheme.Typography.body)
-                        .foregroundStyle(BlitzTheme.Palette.ink)
-                    Text(detailText)
-                        .font(BlitzTheme.Typography.caption)
-                        .foregroundStyle(BlitzTheme.Palette.inkSecondary)
-                }
-                Spacer()
-                if let medal = summary?.bestMedal, medal != .none {
-                    MedalBadge()
-                        .stroke(BlitzTheme.colour(for: medal), lineWidth: 2)
-                        .frame(width: 22, height: 26)
-                        .accessibilityLabel("\(medal.displayName) medal")
-                }
-            }
-            .frame(minHeight: BlitzTheme.Layout.minimumTarget)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .disabled(!isEnabled)
-    }
-
-    /// Explicit empty state rather than a zeroed statistic (FR-NAV-006).
-    private var detailText: String {
-        let target = "Target \(module.targetSCTSeconds / 60):" + String(format: "%02d", module.targetSCTSeconds % 60)
-        guard let summary, summary.hasAttempt else { return "\(target). Not played yet." }
-        guard let best = summary.bestTimeSeconds else { return "\(target). Played \(summary.attemptCount) times." }
-        return "\(target). Best \(String(format: "%.1f", best)) s."
     }
 }
 
