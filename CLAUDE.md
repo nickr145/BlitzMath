@@ -73,6 +73,10 @@ Swift Testing, not XCTest. Suites map to acceptance criteria (`AC-02`, `AC-A04`)
 
 Test doubles already exist and should be reused rather than re-invented: `MockCurriculumProvider`, `MockPlacementProvider`, `MockProgressStore`, `ManualTimeSource`.
 
+## Commit Rules
+
+When making commits messages, do not mention anything under co-authored or what claude session it was. Simply describe what the commit is about.
+
 ## Invariants that are easy to break
 
 - Medals are monotonic. A weaker later result never overwrites a stronger one.
