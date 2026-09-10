@@ -17,23 +17,23 @@ func PlanetoidShape(worldID: String) -> AnyShape {
 struct WorldAShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radius = rect.width / 2
 
-        // Teardrop: wider at top (circle), tapered below
-        // Top hemisphere (circle from center to top)
+        // The silhouette spans radius above the centre and 1.3 * radius below
+        // it, so 2.3 * radius must fit the height and 2 * radius the width.
+        let radius = min(rect.width / 2, rect.height / 2.3) * 0.95
+        let bodyHeight = radius * 2.3
+        let center = CGPoint(x: rect.midX, y: rect.midY - bodyHeight / 2 + radius)
+
+        // Rounded top. SwiftUI's y axis grows downward, so a sweep from 200
+        // degrees to -20 degrees travels over the top of the circle.
         path.addArc(center: center, radius: radius,
-                   startAngle: .degrees(0), endAngle: .degrees(180),
-                   clockwise: false)
+                    startAngle: .degrees(200), endAngle: .degrees(-20),
+                    clockwise: false)
 
-        // Taper down to point at bottom
-        let taperBottom = CGPoint(x: center.x, y: center.y + radius * 0.6)
-        path.addLine(to: taperBottom)
-
-        // Curve back up to complete
-        path.addArc(center: center, radius: radius,
-                   startAngle: .degrees(180), endAngle: .degrees(360),
-                   clockwise: false)
+        // Taper to a point below the body.
+        let tipY = center.y + radius * 1.3
+        path.addLine(to: CGPoint(x: center.x, y: tipY))
+        path.closeSubpath()
 
         return path
     }
@@ -68,15 +68,29 @@ struct WorldCShape: Shape {
 }
 
 // MARK: - World D: Fractured Lands (Segmented sphere)
+///
+/// The segment lines are zero-area subpaths, so they contribute nothing to a
+/// `.fill()`. They render only when the shape is also stroked, which
+/// `PlanetoidContainer` does.
 struct WorldDShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radius = rect.width / 2
+        let radius = min(rect.width, rect.height) / 2
 
         // Draw full circle
         path.addEllipse(in: CGRect(x: center.x - radius, y: center.y - radius,
                                   width: radius * 2, height: radius * 2))
+
+        // Segment lines radiating from centre (division and fraction motif)
+        let segmentAngles: [Double] = [20, 100, 190, 260]
+        for angle in segmentAngles {
+            let radians = angle * .pi / 180
+            let endPoint = CGPoint(x: center.x + radius * cos(radians),
+                                   y: center.y + radius * sin(radians))
+            path.move(to: center)
+            path.addLine(to: endPoint)
+        }
 
         return path
     }
@@ -86,24 +100,21 @@ struct WorldDShape: Shape {
 struct WorldEShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let width = rect.width
-        let height = rect.height
-        let center = CGPoint(x: rect.midX, y: rect.midY)
 
-        // Stack of 3 circles, taller than wide
-        let circleRadius = width / 2
+        // Three horizontal bands, one ellipse centred in each. The bands tile
+        // rect.height exactly and each ellipse is shorter than its band, so the
+        // whole stack stays inside rect at any size.
+        let bandHeight = rect.height / 3
+        let ellipseHeight = bandHeight * 0.9
+        let ellipseWidth = rect.width * 0.85
+        let ellipseX = rect.midX - ellipseWidth / 2
 
-        // Top circle
-        path.addEllipse(in: CGRect(x: center.x - circleRadius, y: center.y - height * 0.4,
-                                  width: circleRadius * 2, height: circleRadius * 1.5))
-
-        // Middle circle (offset)
-        path.addEllipse(in: CGRect(x: center.x - circleRadius, y: center.y - height * 0.1,
-                                  width: circleRadius * 2, height: circleRadius * 1.5))
-
-        // Bottom circle
-        path.addEllipse(in: CGRect(x: center.x - circleRadius, y: center.y + height * 0.2,
-                                  width: circleRadius * 2, height: circleRadius * 1.5))
+        for band in 0..<3 {
+            let bandY = rect.minY + CGFloat(band) * bandHeight
+            let ellipseY = bandY + (bandHeight - ellipseHeight) / 2
+            path.addEllipse(in: CGRect(x: ellipseX, y: ellipseY,
+                                       width: ellipseWidth, height: ellipseHeight))
+        }
 
         return path
     }
@@ -113,7 +124,9 @@ struct WorldEShape: Shape {
 struct WorldFShape: Shape {
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
-        let size = rect.width * 0.7
+        // Matches the visual weight of the other planetoids, which fill or
+        // nearly fill their rect.
+        let size = min(rect.width, rect.height) * 0.85
 
         var path = Path()
         path.move(to: CGPoint(x: center.x, y: center.y - size / 2)) // Top
