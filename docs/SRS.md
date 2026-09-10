@@ -377,6 +377,7 @@ All entities are SwiftData `@Model` classes in a single local `ModelContainer`. 
 | FR-NAV-006 | A Module with no attempt shall display an explicit empty state rather than a zeroed statistic. | P2 | D |
 | FR-NAV-007 | The skill tree shall refresh its lock and Medal state whenever a session summary is dismissed, without an application restart. | P1 | T |
 | FR-NAV-008 | Modules within a Level shall be playable in any order. Only Level entry is gated. | P2 | I |
+| FR-NAV-009 | Selecting an unlocked Level shall present a Level Detail screen listing that Level's Modules, and selecting a Module row there shall start its session. | P2 | D |
 
 ### 5.3 Session lifecycle, FR-SES
 
@@ -473,6 +474,24 @@ All entities are SwiftData `@Model` classes in a single local `ModelContainer`. 
 | FR-OFF-001 | Every function in section 2.2 shall work with the device in Airplane Mode from a cold launch. | P1 | T |
 | FR-OFF-002 | The application shall never present a connectivity error, retry prompt, or offline banner, because no code path requires connectivity. | P1 | T |
 | FR-OFF-003 | The shipping target shall be verified free of runtime networking symbols by an automated inspection step in the release checklist. | P1 | I |
+
+### 5.11 Progress review, FR-PRG
+
+| ID | Requirement | Priority | Verify |
+| --- | --- | --- | --- |
+| FR-PRG-001 | The system shall offer a Progress Review screen listing every World with its gold, silver, and bronze Medal counts. | P3 | D |
+| FR-PRG-002 | The Progress Review screen shall derive its list of Worlds from the bundled curriculum in `level_order`, not from a hard-coded list. | P3 | I |
+| FR-PRG-003 | The Progress Review screen shall be read only. It shall not write to the store. | P3 | I |
+| FR-PRG-004 | A World with no Medal shall show an explicit empty state rather than a zeroed count. | P3 | D |
+
+### 5.12 Player preferences, FR-SET
+
+| ID | Requirement | Priority | Verify |
+| --- | --- | --- | --- |
+| FR-SET-001 | The system shall offer a Settings screen exposing accessibility-related preferences. | P3 | D |
+| FR-SET-002 | The Settings screen shall offer a Reduce Motion preference that is combined by logical or with the device Reduce Motion setting at every animated site. Turning it on shall never re-enable an animation the device setting has suppressed. | P3 | D |
+| FR-SET-003 | A preference shall persist across launches. | P3 | T |
+| FR-SET-004 | The system shall not present a preference that no code path reads. | P3 | I |
 
 ---
 
@@ -729,6 +748,8 @@ Any transition not listed shall be rejected and logged as a programming error.
 | FR-PER | CMP-10, CMP-11 | `ProgressStoreTests` |
 | FR-FBK, FR-ACC | CMP-03, CMP-12 | Manual checklist, UI tests |
 | FR-OFF | All | Release checklist, static inspection |
+| FR-PRG | CMP-10 | Manual checklist |
+| FR-SET | CMP-12 | Manual checklist |
 
 ---
 
