@@ -82,7 +82,7 @@ struct WorldLevelCard: View {
             // Crossed lines for locked state (X)
             Canvas { context, size in
                 var path = Path()
-                let inset = BlitzTheme.Layout.levelCardSize * 0.2
+                let inset = BlitzTheme.Layout.levelCardSize * BlitzTheme.Layout.levelCardLockCrossInsetRatio
                 path.move(to: CGPoint(x: inset, y: inset))
                 path.addLine(to: CGPoint(x: BlitzTheme.Layout.levelCardSize - inset,
                                         y: BlitzTheme.Layout.levelCardSize - inset))
@@ -94,20 +94,29 @@ struct WorldLevelCard: View {
         } else if row.isCompleted {
             // Medal badge for completed
             MedalBadge()
-                .stroke(cardStroke.opacity(BlitzTheme.LevelCardOpacity.completedCheckmark), lineWidth: BlitzTheme.Layout.levelCardStrokeWidth)
+                .stroke(BlitzTheme.colour(for: bestMedalInLevel()), lineWidth: BlitzTheme.Layout.levelCardStrokeWidth)
         } else {
             // Level number for active/in-progress
             Text(row.level.levelID)
                 .font(BlitzTheme.Typography.body)
                 .fontWeight(.semibold)
                 .foregroundStyle(BlitzTheme.Palette.ink)
-                .scaleEffect(isPulsing ? 1.05 : 1.0)
+                .scaleEffect(isPulsing ? BlitzTheme.Motion.pulseMagnitude : 1.0)
         }
     }
 
     private var accessibilityText: String {
         let state = !row.isUnlocked ? "locked" : (row.isCompleted ? "completed" : "open")
         return "\(row.level.levelID), \(state)"
+    }
+
+    /// Compute the best medal across all modules in this level (gold > silver > bronze > none).
+    private func bestMedalInLevel() -> MedalTier {
+        let allMedals = row.summaries.values.compactMap { $0.bestMedal }
+        if allMedals.contains(.gold) { return .gold }
+        if allMedals.contains(.silver) { return .silver }
+        if allMedals.contains(.bronze) { return .bronze }
+        return .none
     }
 
     private func startPulsing() {

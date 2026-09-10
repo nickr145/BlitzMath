@@ -103,6 +103,8 @@ enum BlitzTheme {
         static let levelCardSize: CGFloat = 48
         static let levelCardRadius: CGFloat = 8
         static let levelCardStrokeWidth: CGFloat = 2
+        /// Fraction of card size for lock cross padding (UI-05).
+        static let levelCardLockCrossInsetRatio: CGFloat = 0.2
     }
 
     // MARK: Motion
@@ -116,6 +118,8 @@ enum BlitzTheme {
         static let tapScale: CGFloat = 0.98
         /// Press animation duration for level card tap feedback (UI-05).
         static let pressAnimationDuration: CGFloat = 0.1
+        /// Scale factor for active pulse on level card (UI-05).
+        static let pulseMagnitude: CGFloat = 1.05
 
         /// Cross-fade substitute when Reduce Motion is on (SRS FR-FBK-003).
         static func respectingReduceMotion(_ animation: Animation, reduced: Bool) -> Animation {
@@ -136,13 +140,6 @@ enum BlitzTheme {
         static let lockedX: CGFloat = 0.4
         /// Opacity for checkmark when completed (UI-05).
         static let completedCheckmark: CGFloat = 0.8
-    }
-
-    // MARK: Level card typography
-
-    enum LevelCardTypography {
-        /// Checkmark font for completed level indicator (UI-05).
-        static let checkmark = Font.system(size: 20, weight: .semibold)
     }
 
     // MARK: Medal mapping
