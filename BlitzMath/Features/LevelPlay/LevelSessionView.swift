@@ -101,10 +101,13 @@ struct LevelSessionView: View {
         ZStack {
             Circle()
                 .stroke(BlitzTheme.Palette.rule, lineWidth: BlitzTheme.Layout.ringWidth)
+            // Stroke width intensifies with pace, so the threshold reads as
+            // shape as well as colour (FR-BLZ-005, FR-FBK-004).
             SCTRing(fraction: controller.sctFraction)
                 .stroke(BlitzTheme.colour(for: controller.pace),
-                        style: StrokeStyle(lineWidth: BlitzTheme.Layout.ringWidth, lineCap: .round))
+                        style: StrokeStyle(lineWidth: BlitzTheme.ringStrokeWidth(for: controller.pace), lineCap: .round))
                 .animation(BlitzTheme.Motion.ringTick, value: controller.sctFraction)
+                .animation(BlitzTheme.Motion.ringTick, value: controller.pace)
             VStack(spacing: 2) {
                 Text(controller.elapsedText)
                     .font(BlitzTheme.Typography.timer)

@@ -160,6 +160,16 @@ enum BlitzTheme {
         case .overTarget: Palette.overTarget
         }
     }
+
+    /// Ring stroke width by pace, so the timing ring signals its thresholds
+    /// through shape as well as colour (SRS FR-BLZ-005, FR-FBK-004).
+    static func ringStrokeWidth(for pace: BlitzClock.Pace) -> CGFloat {
+        switch pace {
+        case .comfortable: Layout.ringWidth
+        case .tightening: Layout.ringWidth * 1.25
+        case .overTarget: Layout.ringWidth * 1.5
+        }
+    }
 }
 
 // MARK: - Vector shapes
