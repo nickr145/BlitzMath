@@ -84,6 +84,8 @@ enum BlitzTheme {
         static let body = Font.system(size: 17, weight: .regular)
         static let caption = Font.system(size: 14, weight: .regular)
         static let padDigit = Font.system(size: 28, weight: .medium, design: .rounded)
+        /// Glyph size for the close control on full screen covers (UI-05).
+        static let closeIcon = Font.system(size: 24)
     }
 
     // MARK: Spacing and shape
@@ -100,6 +102,10 @@ enum BlitzTheme {
         static let padRadius: CGFloat = 10
         static let worldDiameter: CGFloat = 280
         static let worldSpacing: CGFloat = 16
+        /// Outline weight of a planetoid on the skill tree (UI-05).
+        static let worldStrokeWidth: CGFloat = 2.5
+        /// Room below a planetoid for its locked requirement caption (UI-05, FR-NAV-003).
+        static let worldCaptionHeight: CGFloat = 100
         static let levelCardSize: CGFloat = 48
         static let levelCardRadius: CGFloat = 8
         static let levelCardStrokeWidth: CGFloat = 2
@@ -107,6 +113,10 @@ enum BlitzTheme {
         static let levelCardLockCrossInsetRatio: CGFloat = 0.2
         /// Diameter of the world map pagination dots (UI-05).
         static let paginationDotSize: CGFloat = 6
+        /// Medal badge drawn beside a module row (UI-05, FR-NAV-005).
+        static let moduleMedalWidth: CGFloat = 22
+        static let moduleMedalHeight: CGFloat = 26
+        static let moduleMedalStrokeWidth: CGFloat = 2
     }
 
     // MARK: Motion
@@ -122,6 +132,11 @@ enum BlitzTheme {
         static let pressAnimationDuration: CGFloat = 0.1
         /// Scale factor for active pulse on level card (UI-05).
         static let pulseMagnitude: CGFloat = 1.05
+
+        /// Defaults key behind the in-app Reduce Motion preference (SRS FR-SET-002).
+        /// Read with `@AppStorage` alongside `\.accessibilityReduceMotion` so a view
+        /// re-renders when either source changes.
+        static let reduceMotionOverrideKey = "reduceMotionOverride"
 
         /// Cross-fade substitute when Reduce Motion is on (SRS FR-FBK-003).
         static func respectingReduceMotion(_ animation: Animation, reduced: Bool) -> Animation {

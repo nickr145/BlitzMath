@@ -30,7 +30,7 @@ struct LevelDetailView: View {
                 Spacer()
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 24))
+                        .font(BlitzTheme.Typography.closeIcon)
                         .foregroundStyle(BlitzTheme.Palette.inkSecondary)
                 }
                 .frame(minWidth: BlitzTheme.Layout.minimumTarget, minHeight: BlitzTheme.Layout.minimumTarget)
@@ -81,12 +81,15 @@ struct ModuleDetailRow: View {
                     Spacer()
                     if let medal = summary?.bestMedal, medal != .none {
                         MedalBadge()
-                            .stroke(BlitzTheme.colour(for: medal), lineWidth: 2)
-                            .frame(width: 22, height: 26)
+                            .stroke(BlitzTheme.colour(for: medal),
+                                    lineWidth: BlitzTheme.Layout.moduleMedalStrokeWidth)
+                            .frame(width: BlitzTheme.Layout.moduleMedalWidth,
+                                   height: BlitzTheme.Layout.moduleMedalHeight)
+                            .accessibilityLabel("\(medal.displayName) medal")
                     }
                 }
 
-                Text("Target: \(module.targetSCTSeconds / 60):" + String(format: "%02d", module.targetSCTSeconds % 60))
+                Text(detailText)
                     .font(BlitzTheme.Typography.caption)
                     .foregroundStyle(BlitzTheme.Palette.inkSecondary)
             }
@@ -97,6 +100,18 @@ struct ModuleDetailRow: View {
         }
         .buttonStyle(.plain)
         .frame(minHeight: BlitzTheme.Layout.minimumTarget)
+    }
+
+    /// Target SCT plus an explicit empty state rather than a zeroed statistic
+    /// (SRS FR-NAV-005, FR-NAV-006).
+    private var detailText: String {
+        let target = "Target \(module.targetSCTSeconds / 60):"
+            + String(format: "%02d", module.targetSCTSeconds % 60)
+        guard let summary, summary.hasAttempt else { return "\(target). Not played yet." }
+        guard let best = summary.bestTimeSeconds else {
+            return "\(target). Played \(summary.attemptCount) times."
+        }
+        return "\(target). Best \(String(format: "%.1f", best)) s."
     }
 }
 
