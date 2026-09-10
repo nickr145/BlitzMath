@@ -114,11 +114,35 @@ enum BlitzTheme {
         static let medalReveal = Animation.spring(response: 0.55, dampingFraction: 0.62)
         static let pulseDuration: CGFloat = 2.0
         static let tapScale: CGFloat = 0.98
+        /// Press animation duration for level card tap feedback (UI-05).
+        static let pressAnimationDuration: CGFloat = 0.1
 
         /// Cross-fade substitute when Reduce Motion is on (SRS FR-FBK-003).
         static func respectingReduceMotion(_ animation: Animation, reduced: Bool) -> Animation {
             reduced ? .easeInOut(duration: 0.15) : animation
         }
+    }
+
+    // MARK: Level card opacity
+
+    enum LevelCardOpacity {
+        /// Opacity when level is locked (UI-05).
+        static let locked: CGFloat = 0.1
+        /// Opacity when level is completed (UI-05).
+        static let completed: CGFloat = 0.85
+        /// Opacity for stroke when locked (UI-05).
+        static let lockedStroke: CGFloat = 0.5
+        /// Opacity for X mark when locked (UI-05).
+        static let lockedX: CGFloat = 0.4
+        /// Opacity for checkmark when completed (UI-05).
+        static let completedCheckmark: CGFloat = 0.8
+    }
+
+    // MARK: Level card typography
+
+    enum LevelCardTypography {
+        /// Checkmark font for completed level indicator (UI-05).
+        static let checkmark = Font.system(size: 20, weight: .semibold)
     }
 
     // MARK: Medal mapping

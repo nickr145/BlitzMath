@@ -29,7 +29,7 @@ struct WorldLevelCard: View {
         .frame(width: BlitzTheme.Layout.levelCardSize, height: BlitzTheme.Layout.levelCardSize)
         .onTapGesture { if row.isUnlocked { onTap(row.level.levelID) } }
         .scaleEffect(isPressed && row.isUnlocked ? BlitzTheme.Motion.tapScale : 1.0)
-        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .animation(.easeInOut(duration: BlitzTheme.Motion.pressAnimationDuration), value: isPressed)
         .onLongPressGesture(minimumDuration: 0.001) {
             if row.isUnlocked { isPressed = true }
         } onPressingChanged: { isPressing in
@@ -42,39 +42,37 @@ struct WorldLevelCard: View {
     }
 
     private var cardFill: Color {
-        let palette = BlitzTheme.WorldPalette
         let worldColor: Color
 
         switch worldID.uppercased() {
-        case "A": worldColor = palette.a.fill
-        case "B": worldColor = palette.b.fill
-        case "C": worldColor = palette.c.fill
-        case "D": worldColor = palette.d.fill
-        case "E": worldColor = palette.e.fill
-        case "F": worldColor = palette.f.fill
-        default: worldColor = palette.a.fill
+        case "A": worldColor = BlitzTheme.WorldPalette.a.fill
+        case "B": worldColor = BlitzTheme.WorldPalette.b.fill
+        case "C": worldColor = BlitzTheme.WorldPalette.c.fill
+        case "D": worldColor = BlitzTheme.WorldPalette.d.fill
+        case "E": worldColor = BlitzTheme.WorldPalette.e.fill
+        case "F": worldColor = BlitzTheme.WorldPalette.f.fill
+        default: worldColor = BlitzTheme.WorldPalette.a.fill
         }
 
-        if !row.isUnlocked { return worldColor.opacity(0.1) }
-        if row.isCompleted { return worldColor.opacity(0.85) }
+        if !row.isUnlocked { return worldColor.opacity(BlitzTheme.LevelCardOpacity.locked) }
+        if row.isCompleted { return worldColor.opacity(BlitzTheme.LevelCardOpacity.completed) }
         return worldColor
     }
 
     private var cardStroke: Color {
-        let palette = BlitzTheme.WorldPalette
         let worldColor: Color
 
         switch worldID.uppercased() {
-        case "A": worldColor = palette.a.outline
-        case "B": worldColor = palette.b.outline
-        case "C": worldColor = palette.c.outline
-        case "D": worldColor = palette.d.outline
-        case "E": worldColor = palette.e.outline
-        case "F": worldColor = palette.f.outline
-        default: worldColor = palette.a.outline
+        case "A": worldColor = BlitzTheme.WorldPalette.a.outline
+        case "B": worldColor = BlitzTheme.WorldPalette.b.outline
+        case "C": worldColor = BlitzTheme.WorldPalette.c.outline
+        case "D": worldColor = BlitzTheme.WorldPalette.d.outline
+        case "E": worldColor = BlitzTheme.WorldPalette.e.outline
+        case "F": worldColor = BlitzTheme.WorldPalette.f.outline
+        default: worldColor = BlitzTheme.WorldPalette.a.outline
         }
 
-        if !row.isUnlocked { return worldColor.opacity(0.5) }
+        if !row.isUnlocked { return worldColor.opacity(BlitzTheme.LevelCardOpacity.lockedStroke) }
         return worldColor
     }
 
@@ -82,7 +80,7 @@ struct WorldLevelCard: View {
     private var stateContent: some View {
         if !row.isUnlocked {
             // Crossed lines for locked state (X)
-            Canvas { context in
+            Canvas { context, size in
                 var path = Path()
                 let inset = BlitzTheme.Layout.levelCardSize * 0.2
                 path.move(to: CGPoint(x: inset, y: inset))
@@ -91,19 +89,19 @@ struct WorldLevelCard: View {
                 path.move(to: CGPoint(x: BlitzTheme.Layout.levelCardSize - inset, y: inset))
                 path.addLine(to: CGPoint(x: inset,
                                         y: BlitzTheme.Layout.levelCardSize - inset))
-                context.stroke(path, with: .color(cardStroke.opacity(0.4)), lineWidth: 1.5)
+                context.stroke(path, with: .color(cardStroke.opacity(BlitzTheme.LevelCardOpacity.lockedX)), lineWidth: BlitzTheme.Layout.levelCardStrokeWidth)
             }
         } else if row.isCompleted {
-            // Checkmark for completed
-            Image(systemName: "checkmark")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(cardStroke.opacity(0.8))
+            // Medal badge for completed
+            MedalBadge()
+                .stroke(cardStroke.opacity(BlitzTheme.LevelCardOpacity.completedCheckmark), lineWidth: BlitzTheme.Layout.levelCardStrokeWidth)
         } else {
             // Level number for active/in-progress
             Text(row.level.levelID)
                 .font(BlitzTheme.Typography.body)
                 .fontWeight(.semibold)
                 .foregroundStyle(BlitzTheme.Palette.ink)
+                .scaleEffect(isPulsing ? 1.05 : 1.0)
         }
     }
 
