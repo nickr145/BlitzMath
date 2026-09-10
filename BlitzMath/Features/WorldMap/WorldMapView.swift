@@ -75,7 +75,8 @@ struct WorldMapView: View {
     @State private var model: WorldMapViewModel
     private let makeSessionController: () -> LevelSessionController
 
-    @State private var activeModuleID: String?
+    /// Non-nil while a World's module list is presented (FR-NAV).
+    @State private var activeDetailRow: WorldMapViewModel.LevelRow?
     @State private var currentWorldIndex = 0
     /// Requirement text for a locked level the player just tapped (FR-NAV-003).
     /// Presented as a toast-style alert; non-nil drives its visibility.
@@ -98,9 +99,9 @@ struct WorldMapView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: BlitzTheme.Layout.worldSpacing) {
                                 ForEach(model.rows) { row in
-                                    PlanetoidContainer(row: row, scrollProxy: scrollProxy) { moduleID in
+                                    PlanetoidContainer(row: row, scrollProxy: scrollProxy) {
                                         guard row.isUnlocked else { return }
-                                        activeModuleID = moduleID
+                                        activeDetailRow = row
                                     } onLockedTap: {
                                         lockedMessageText = row.requirementText
                                             ?? "Complete the previous level first."
@@ -117,8 +118,8 @@ struct WorldMapView: View {
                 }
             }
             .task { model.refresh() }
-            .fullScreenCover(item: $activeModuleID) { moduleID in
-                LevelSessionView(moduleID: moduleID, controller: makeSessionController())
+            .fullScreenCover(item: $activeDetailRow) { row in
+                LevelDetailView(row: row, makeSessionController: makeSessionController)
                     .onDisappear { model.refresh() }
             }
             .alert(
@@ -172,7 +173,9 @@ extension String: @retroactive Identifiable {
 struct PlanetoidContainer: View {
     let row: WorldMapViewModel.LevelRow
     let scrollProxy: ScrollViewProxy
-    let onSelectModule: (String) -> Void
+    /// Fires when the level's card is tapped while unlocked, to open its
+    /// module list (LevelDetailView).
+    let onSelectLevel: () -> Void
     /// Fires when the level's card is tapped while locked (FR-NAV-003, FR-NAV-004).
     var onLockedTap: () -> Void = {}
 
@@ -227,10 +230,10 @@ struct PlanetoidContainer: View {
     private var levelCardsOverlay: some View {
         VStack(spacing: BlitzTheme.Layout.tightGap) {
             HStack(spacing: BlitzTheme.Layout.tightGap) {
-                // TODO(Task 6): navigate to LevelDetailView on unlocked tap
-                // instead of launching a session directly.
-                WorldLevelCard(row: row, worldID: row.level.levelID) { moduleID in
-                    onSelectModule(moduleID)
+                // Unlocked tap opens the World's module list (LevelDetailView);
+                // locked tap surfaces the unlock requirement (FR-NAV-003).
+                WorldLevelCard(row: row, worldID: row.level.levelID) { _ in
+                    onSelectLevel()
                 } onLockedTap: {
                     onLockedTap()
                 }
