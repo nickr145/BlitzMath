@@ -38,6 +38,40 @@ enum BlitzTheme {
         static let bronze = Color(red: 0.722, green: 0.494, blue: 0.310)
     }
 
+    // MARK: World palette
+
+    struct WorldPalette {
+        struct World {
+            let fill: Color
+            let outline: Color
+            let accent: Color
+        }
+
+        static let a = World(fill: Color(red: 0.961, green: 0.902, blue: 0.827), // #F5E6D3
+                             outline: Color(red: 0.545, green: 0.451, blue: 0.325), // #8B7355
+                             accent: Color(red: 0.420, green: 0.365, blue: 0.259)) // #6B5D42
+
+        static let b = World(fill: Color(red: 0.659, green: 0.847, blue: 0.910), // #A8D8E8
+                             outline: Color(red: 0.169, green: 0.373, blue: 0.498), // #2B5F7F
+                             accent: Color(red: 0.102, green: 0.247, blue: 0.361)) // #1A3F5C
+
+        static let c = World(fill: Color(red: 0.722, green: 0.902, blue: 0.659), // #B8E6A8
+                             outline: Color(red: 0.290, green: 0.486, blue: 0.306), // #4A7C4E
+                             accent: Color(red: 0.176, green: 0.353, blue: 0.192)) // #2D5A31
+
+        static let d = World(fill: Color(red: 0.961, green: 0.776, blue: 0.580), // #F5C694
+                             outline: Color(red: 0.788, green: 0.482, blue: 0.310), // #C97B4F
+                             accent: Color(red: 0.659, green: 0.388, blue: 0.255)) // #A86341
+
+        static let e = World(fill: Color(red: 0.831, green: 0.647, blue: 0.851), // #D4A5D9
+                             outline: Color(red: 0.420, green: 0.298, blue: 0.478), // #6B4C7A
+                             accent: Color(red: 0.302, green: 0.212, blue: 0.349)) // #4D3659
+
+        static let f = World(fill: Color(red: 0.102, green: 0.227, blue: 0.322), // #1A3A52
+                             outline: Color(red: 0.0, green: 0.831, blue: 1.0), // #00D4FF
+                             accent: Color(red: 0.290, green: 0.498, blue: 1.0)) // #4A7FFF
+    }
+
     // MARK: Type
 
     enum Typography {
@@ -50,6 +84,8 @@ enum BlitzTheme {
         static let body = Font.system(size: 17, weight: .regular)
         static let caption = Font.system(size: 14, weight: .regular)
         static let padDigit = Font.system(size: 28, weight: .medium, design: .rounded)
+        /// Glyph size for the close control on full screen covers (UI-05).
+        static let closeIcon = Font.system(size: 24)
     }
 
     // MARK: Spacing and shape
@@ -64,6 +100,23 @@ enum BlitzTheme {
         static let ringWidth: CGFloat = 12
         static let cardRadius: CGFloat = 14
         static let padRadius: CGFloat = 10
+        static let worldDiameter: CGFloat = 280
+        static let worldSpacing: CGFloat = 16
+        /// Outline weight of a planetoid on the skill tree (UI-05).
+        static let worldStrokeWidth: CGFloat = 2.5
+        /// Room below a planetoid for its locked requirement caption (UI-05, FR-NAV-003).
+        static let worldCaptionHeight: CGFloat = 100
+        static let levelCardSize: CGFloat = 48
+        static let levelCardRadius: CGFloat = 8
+        static let levelCardStrokeWidth: CGFloat = 2
+        /// Fraction of card size for lock cross padding (UI-05).
+        static let levelCardLockCrossInsetRatio: CGFloat = 0.2
+        /// Diameter of the world map pagination dots (UI-05).
+        static let paginationDotSize: CGFloat = 6
+        /// Medal badge drawn beside a module row (UI-05, FR-NAV-005).
+        static let moduleMedalWidth: CGFloat = 22
+        static let moduleMedalHeight: CGFloat = 26
+        static let moduleMedalStrokeWidth: CGFloat = 2
     }
 
     // MARK: Motion
@@ -73,11 +126,35 @@ enum BlitzTheme {
         static let ringTick = Animation.linear(duration: 0.1)
         /// The single orchestrated moment in the app: the medal reveal.
         static let medalReveal = Animation.spring(response: 0.55, dampingFraction: 0.62)
+        static let pulseDuration: CGFloat = 2.0
+        static let tapScale: CGFloat = 0.98
+        /// Press animation duration for level card tap feedback (UI-05).
+        static let pressAnimationDuration: CGFloat = 0.1
+        /// Scale factor for active pulse on level card (UI-05).
+        static let pulseMagnitude: CGFloat = 1.05
+
+        /// Defaults key behind the in-app Reduce Motion preference (SRS FR-SET-002).
+        /// Read with `@AppStorage` alongside `\.accessibilityReduceMotion` so a view
+        /// re-renders when either source changes.
+        static let reduceMotionOverrideKey = "reduceMotionOverride"
 
         /// Cross-fade substitute when Reduce Motion is on (SRS FR-FBK-003).
         static func respectingReduceMotion(_ animation: Animation, reduced: Bool) -> Animation {
             reduced ? .easeInOut(duration: 0.15) : animation
         }
+    }
+
+    // MARK: Level card opacity
+
+    enum LevelCardOpacity {
+        /// Opacity when level is locked (UI-05).
+        static let locked: CGFloat = 0.1
+        /// Opacity when level is completed (UI-05).
+        static let completed: CGFloat = 0.85
+        /// Opacity for stroke when locked (UI-05).
+        static let lockedStroke: CGFloat = 0.5
+        /// Opacity for X mark when locked (UI-05).
+        static let lockedX: CGFloat = 0.4
     }
 
     // MARK: Medal mapping
@@ -96,6 +173,16 @@ enum BlitzTheme {
         case .comfortable: Palette.velocity
         case .tightening: Palette.tightening
         case .overTarget: Palette.overTarget
+        }
+    }
+
+    /// Ring stroke width by pace, so the timing ring signals its thresholds
+    /// through shape as well as colour (SRS FR-BLZ-005, FR-FBK-004).
+    static func ringStrokeWidth(for pace: BlitzClock.Pace) -> CGFloat {
+        switch pace {
+        case .comfortable: Layout.ringWidth
+        case .tightening: Layout.ringWidth * 1.25
+        case .overTarget: Layout.ringWidth * 1.5
         }
     }
 }

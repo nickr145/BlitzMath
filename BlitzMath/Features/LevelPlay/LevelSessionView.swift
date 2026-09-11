@@ -11,8 +11,12 @@ import SwiftUI
 struct LevelSessionView: View {
 
     @State private var controller: LevelSessionController
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     @Environment(\.dismiss) private var dismiss
+    /// In-app Reduce Motion preference (SRS FR-SET-002).
+    @AppStorage(BlitzTheme.Motion.reduceMotionOverrideKey) private var reduceMotionOverride = false
+
+    private var reduceMotion: Bool { systemReduceMotion || reduceMotionOverride }
 
     private let moduleID: String
 
@@ -101,10 +105,13 @@ struct LevelSessionView: View {
         ZStack {
             Circle()
                 .stroke(BlitzTheme.Palette.rule, lineWidth: BlitzTheme.Layout.ringWidth)
+            // Stroke width intensifies with pace, so the threshold reads as
+            // shape as well as colour (FR-BLZ-005, FR-FBK-004).
             SCTRing(fraction: controller.sctFraction)
                 .stroke(BlitzTheme.colour(for: controller.pace),
-                        style: StrokeStyle(lineWidth: BlitzTheme.Layout.ringWidth, lineCap: .round))
+                        style: StrokeStyle(lineWidth: BlitzTheme.ringStrokeWidth(for: controller.pace), lineCap: .round))
                 .animation(BlitzTheme.Motion.ringTick, value: controller.sctFraction)
+                .animation(BlitzTheme.Motion.ringTick, value: controller.pace)
             VStack(spacing: 2) {
                 Text(controller.elapsedText)
                     .font(BlitzTheme.Typography.timer)
@@ -347,8 +354,12 @@ struct SessionSummaryView: View {
     let onRetrySave: () -> Void
     let onDone: () -> Void
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    /// In-app Reduce Motion preference (SRS FR-SET-002).
+    @AppStorage(BlitzTheme.Motion.reduceMotionOverrideKey) private var reduceMotionOverride = false
     @State private var revealed = false
+
+    private var reduceMotion: Bool { systemReduceMotion || reduceMotionOverride }
 
     var body: some View {
         VStack(spacing: BlitzTheme.Layout.stackGap) {
